@@ -346,53 +346,48 @@ void NTSS(Mat big,Mat small)
     assert(big.cols>(small.cols+16));
     assert(big.rows>(small.rows+16));
 
-    int x_c=int(float(big.cols)/2.0);
-    int y_c=int(float(big.rows)/2.0);
+	if (big.channels() == 3)
+		cvtColor(big, big, CV_BGR2GRAY);
+	if (small.channels() == 3)
+		cvtColor(small, small, CV_BGR2GRAY);
+
+    int x_c=int(big.cols/2.0);
+    int y_c=int(big.rows/2.0);
     int count=0;
     int w=small.cols, h=small.rows;
 
+	vector<Point> res = { Point(0,0),Point(-1,-1), Point(0,-1), Point(1,-1), Point(-1,0),
+						Point(1,0), Point(-1,1), Point(0,1), Point(1,1) };
+
+
     while(count<3)
     {
-        Mat roi,diff;
-        roi=big(Rect(x_c-w/2.0,y_c-h/2.0,w,h));
-        absdiff(roi,small,diff);
-        threshold(diff,diff,100,255,THRESH_BINARY);
-
-        vector<int> scores;
-        scores.push_back(countNonZero(diff));
-
-        vector<int>::iterator smallest = min_element(begin(scores), end(scores));
-        int pos=distance(begin(scores), smallest);
-
-        switch (pos) {
-            case 0:
-            break;
-            case 1:
-                x_c+=-1,y_c+=-1;
-            break;
-            case 2:
-                x_c+=0,y_c+=-1;
-            break;
-            case 3:
-                x_c+=1,y_c+=-1;
-            break;
-            case 4:
-                x_c+=-1,y_c+=0;
-            break;
-            case 5:
-                x_c+=1,y_c+=0;
-            break;
-            case 6:
-                x_c+=-1,y_c+=1;
-            break;
-        }
+		vector<int> scores;
+		for (int i = 0; i < res.size(); i++)
+		{
+			Mat roi, diff;
+			roi = big(Rect(x_c+res[i].x - w / 2.0, y_c+res[i].y - h / 2.0, w, h));
+			cv::absdiff(roi, small, diff);
+			//threshold(diff, diff, 100, 255, THRESH_BINARY);
+			scores.push_back(countNonZero(diff));
+		}
+		vector<int>::iterator smallest = min_element(begin(scores), end(scores));
+		int pos = distance(begin(scores), smallest);
+		cout << pos << endl;
+		x_c += res[pos].x;
+		y_c += res[pos].y;
+		count++;
     }
+	Mat roi, diff;
+	roi = big(Rect(x_c - w / 2.0, y_c - h / 2.0, w, h));
+	cv::absdiff(roi, small, diff);
+	cv::imshow("correct_diff", diff);
 }
 
 
 int main()
 {
-    Mat frame_1=imread("C:\\Users\\LIUU\\Pictures\\IR_detect_5\\1576640196.04.jpg",1);
+    cv::Mat frame_1=imread("C:\\Users\\LIUU\\Pictures\\IR_detect_5\\1576640196.04.jpg",1);
     Mat frame_2=imread("C:\\Users\\LIUU\\Pictures\\IR_detect_5\\1576640196.29.jpg",1);
 
 //    Mat frame_1=imread("/home/liuu/Pictures/IR_detect_5/1576640165.54.jpg",1);
@@ -401,9 +396,6 @@ int main()
 //    Mat frame_1=imread("/home/liuu/Pictures/IR_detect_5/1576640151.54.jpg",1);
 //    Mat frame_2=imread("/home/liuu/Pictures/IR_detect_5/1576640151.79.jpg",1);
 
-    imshow("frame_1",frame_1);
-    imshow("frame_2",frame_2);
-    waitKey(0);
     Mat Diff;
     absdiff(frame_1,frame_2,Diff);
     imshow("Diff",Diff);
@@ -425,15 +417,16 @@ int main()
             int r_1=max(ell_1._a,ell_2._b);
             int r_2=max(ell_2._a,ell_2._b);
             int r=max(r_1,r_2);
-            Rect rect_1=Rect(ell_1._xc-r,ell_1._yc-r,2*r,2*r);
+            Rect rect_1=Rect(ell_1._xc-r-9,ell_1._yc-r-9,2*r+18,2*r+18);
             Rect rect_2=Rect(ell_2._xc-r,ell_2._yc-r,2*r,2*r);
             Mat roi_1=frame_1(rect_1),roi_2=frame_2(rect_2);
             imshow("roi_1",roi_1);
             imshow("roi_2",roi_2);
             waitKey(0);
-            Mat diff;
-            absdiff(roi_1,roi_2,diff);
-            imshow("diff",diff);
+            //Mat diff;
+            //absdiff(roi_1,roi_2,diff);
+            //imshow("diff",diff);
+			NTSS(roi_1, roi_2);
             waitKey(0);
         }
     }
