@@ -29,6 +29,7 @@ last update: 23/12/2014
 #include <opencv2/opencv.hpp>
 #include "EllipseDetectorYaed.h"
 #include <fstream>
+#include "myAlgorithm.h"
 
 
 using namespace std;
@@ -340,52 +341,9 @@ vector<Ellipse> OnImage(Mat image)
     return ellsYaed;
 }
 
-#include <algorithm>
-void NTSS(Mat big,Mat small)
-{
-    assert(big.cols>(small.cols+16));
-    assert(big.rows>(small.rows+16));
-
-	if (big.channels() == 3)
-		cvtColor(big, big, CV_BGR2GRAY);
-	if (small.channels() == 3)
-		cvtColor(small, small, CV_BGR2GRAY);
-
-    int x_c=int(big.cols/2.0);
-    int y_c=int(big.rows/2.0);
-    int count=0;
-    int w=small.cols, h=small.rows;
-
-	vector<Point> res = { Point(0,0),Point(-1,-1), Point(0,-1), Point(1,-1), Point(-1,0),
-						Point(1,0), Point(-1,1), Point(0,1), Point(1,1) };
 
 
-    while(count<3)
-    {
-		vector<int> scores;
-		for (int i = 0; i < res.size(); i++)
-		{
-			Mat roi, diff;
-			roi = big(Rect(x_c+res[i].x - w / 2.0, y_c+res[i].y - h / 2.0, w, h));
-			cv::absdiff(roi, small, diff);
-			//threshold(diff, diff, 100, 255, THRESH_BINARY);
-			scores.push_back(countNonZero(diff));
-		}
-		vector<int>::iterator smallest = min_element(begin(scores), end(scores));
-		int pos = distance(begin(scores), smallest);
-		cout << pos << endl;
-		x_c += res[pos].x;
-		y_c += res[pos].y;
-		count++;
-    }
-	Mat roi, diff;
-	roi = big(Rect(x_c - w / 2.0, y_c - h / 2.0, w, h));
-	cv::absdiff(roi, small, diff);
-	cv::imshow("correct_diff", diff);
-}
-
-
-int main()
+int main_0()
 {
     cv::Mat frame_1=imread("C:\\Users\\LIUU\\Pictures\\IR_detect_5\\1576640196.04.jpg",1);
     Mat frame_2=imread("C:\\Users\\LIUU\\Pictures\\IR_detect_5\\1576640196.29.jpg",1);
@@ -417,12 +375,14 @@ int main()
             int r_1=max(ell_1._a,ell_2._b);
             int r_2=max(ell_2._a,ell_2._b);
             int r=max(r_1,r_2);
-            Rect rect_1=Rect(ell_1._xc-r-9,ell_1._yc-r-9,2*r+18,2*r+18);
-            Rect rect_2=Rect(ell_2._xc-r,ell_2._yc-r,2*r,2*r);
+			double zoom = (r_1 > r_2) ? (r_1 / (1.0 * r_2)) : (r_2 / (1.0 * r_1));
+            //Rect rect_1=Rect(ell_1._xc-r-9,ell_1._yc-r-9,2*r+18,2*r+18);
+			Rect rect_1 = Rect(ell_1._xc - r_1-9, ell_1._yc - r_1-9, 2 * r_1+18, 2 * r_1+18);
+            Rect rect_2=Rect(ell_2._xc-r_2,ell_2._yc-r_2,2*r_2,2*r_2);
             Mat roi_1=frame_1(rect_1),roi_2=frame_2(rect_2);
+			cv::resize(roi_2, roi_2, cv::Size(2*r_1,2*r_1));
             imshow("roi_1",roi_1);
             imshow("roi_2",roi_2);
-            waitKey(0);
             //Mat diff;
             //absdiff(roi_1,roi_2,diff);
             //imshow("diff",diff);
@@ -430,4 +390,13 @@ int main()
             waitKey(0);
         }
     }
+}
+
+
+int main()
+{
+	cv::Mat diff = cv::imread("C:\\Users\\LIUU\\Pictures\\correct_diff_2.jpg", 0);
+	processDiff(diff);
+
+	return 0;
 }

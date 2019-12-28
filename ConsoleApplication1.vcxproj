@@ -143,11 +143,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CameraCalibration.cpp" />
     <ClCompile Include="common.cpp" />
     <ClCompile Include="EllipseDetectorYaed.cpp" />
+    <ClCompile Include="GeometryTypes.cpp" />
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CameraCalibration.hpp" />
+    <ClInclude Include="GeometryTypes.hpp" />
+    <ClInclude Include="myAlgorithm.h" />
     <ClInclude Include="common.h" />
     <ClInclude Include="EllipseDetectorYaed.h" />
   </ItemGroup>

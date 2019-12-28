@@ -24,12 +24,27 @@
     <ClCompile Include="Main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="CameraCalibration.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="GeometryTypes.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="EllipseDetectorYaed.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="myAlgorithm.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="GeometryTypes.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraCalibration.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
