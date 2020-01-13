@@ -30,6 +30,7 @@ last update: 23/12/2014
 #include "EllipseDetectorYaed.h"
 #include <fstream>
 #include "myAlgorithm.h"
+#include <iostream>
 
 
 using namespace std;
@@ -348,12 +349,6 @@ int main_0()
     cv::Mat frame_1=imread("C:\\Users\\LIUU\\Pictures\\IR_detect_5\\1576640196.04.jpg",1);
     Mat frame_2=imread("C:\\Users\\LIUU\\Pictures\\IR_detect_5\\1576640196.29.jpg",1);
 
-//    Mat frame_1=imread("/home/liuu/Pictures/IR_detect_5/1576640165.54.jpg",1);
-//    Mat frame_2=imread("/home/liuu/Pictures/IR_detect_5/1576640165.79.jpg",1);
-
-//    Mat frame_1=imread("/home/liuu/Pictures/IR_detect_5/1576640151.54.jpg",1);
-//    Mat frame_2=imread("/home/liuu/Pictures/IR_detect_5/1576640151.79.jpg",1);
-
     Mat Diff;
     absdiff(frame_1,frame_2,Diff);
     imshow("Diff",Diff);
@@ -386,7 +381,6 @@ int main_0()
             //Mat diff;
             //absdiff(roi_1,roi_2,diff);
             //imshow("diff",diff);
-			NTSS(roi_1, roi_2);
             waitKey(0);
         }
     }
@@ -395,8 +389,19 @@ int main_0()
 
 int main()
 {
-	cv::Mat diff = cv::imread("C:\\Users\\LIUU\\Pictures\\correct_diff_2.jpg", 0);
-	processDiff(diff);
+	IR_detect detector;
+	int i = 0;
+	while (++i)
+	{
+		cv::Mat diff = cv::imread("C:\\Users\\LIUU\\Pictures\\diff_image\\" + to_string(i) + ".jpg", 0);
+		assert(diff.channels() == 1);
+		
+		detector.diff = diff;
+		detector.cutInnerRing();
+		detector.processCutDiff();
 
-	return 0;
+		cv::waitKey(0);
+		if (detector.isShow)
+			cv::destroyAllWindows();
+	}
 }
